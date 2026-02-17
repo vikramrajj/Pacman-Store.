@@ -1,0 +1,12 @@
+{
+  "name": "pacman-store-navigator",
+  "version": "1.0.0",
+  "description": "Pac-Man Store Navigator",
+  "main": "js/main.js",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/test-routing.mjs"
+  },
+  "author": "",
+  "license": "MIT"
+}

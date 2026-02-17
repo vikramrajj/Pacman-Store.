@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>PAC-STORE — Find Products the Fun Way!</title>
+    <meta name="description"
+        content="Pac-Man style store navigator. Scan the QR code, search for a product, and follow the dots through the store maze to find it!">
+    <meta name="theme-color" content="#0a0a1a">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👾</text></svg>">
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- ═══════════ LANDING SCREEN ═══════════ -->
+        <div id="landing-screen" class="landing-screen">
+            <div class="logo">
+                <div class="logo-icon">👾</div>
+                <h1>PAC-STORE</h1>
+                <span class="subtitle">Navigate the Store, Arcade Style</span>
+            </div>
+
+            <div class="qr-section">
+                <h2>📱 SCAN TO PLAY</h2>
+                <canvas id="qr-canvas" width="200" height="200"></canvas>
+                <p class="qr-label">Scan this QR code at the store entrance</p>
+            </div>
+
+            <button id="enter-store-btn" class="enter-btn">
+                🚀 Enter Store
+            </button>
+
+            <div class="how-it-works">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <span>📱 Scan QR at store entrance</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <span>📝 Build your shopping list</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <span>🎮 Follow the dots to find them!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ GAME SCREEN ═══════════ -->
+        <div id="game-screen" class="game-screen hidden">
+            <!-- Header -->
+            <div class="game-header">
+                <h1>🕹️ PAC-STORE</h1>
+            </div>
+
+            <!-- Main Layout: List + Game side by side on desktop, stacked on mobile -->
+            <div class="game-layout">
+
+                <!-- Shopping List Panel (To-Do List) -->
+                <div class="shopping-list-panel">
+                    <div class="list-header">
+                        <h2>📝 Shopping List</h2>
+                        <span class="list-count" id="list-count">0 items</span>
+                    </div>
+
+                    <!-- Add Item Input -->
+                    <div class="add-item-bar">
+                        <input type="text" id="product-search" placeholder="🔍 Add product (e.g. milk)"
+                            autocomplete="off" spellcheck="false">
+                        <button id="add-btn" class="add-btn">+ ADD</button>
+                        <div id="suggestions" class="suggestions hidden"></div>
+                    </div>
+
+                    <!-- Shopping List Items -->
+                    <div class="list-items" id="list-items">
+                        <div class="list-empty" id="list-empty">
+                            <span>🛒</span>
+                            <p>Your list is empty</p>
+                            <p class="hint">Add products above to build your route!</p>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-section hidden" id="progress-section">
+                        <div class="progress-label">
+                            <span>🗺️ Route Progress</span>
+                            <span id="progress-text">0/0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="list-actions">
+                        <button id="start-run-btn" class="start-run-btn" disabled>
+                            🛒 Start Shopping Run!
+                        </button>
+                        <button id="clear-list-btn" class="clear-btn">
+                            🗑️ Clear List
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Game Area -->
+                <div class="game-area">
+                    <!-- HUD -->
+                    <div class="hud">
+                        <div class="hud-item">
+                            <button id="step-mode-btn" class="step-mode-btn" title="Toggle Step Counter Mode">
+                                👣 OFF
+                            </button>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">Steps</span>
+                            <span class="hud-value" id="step-count">0</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">Floor</span>
+                            <span class="hud-value" id="floor-display">1F</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">Score</span>
+                            <span class="hud-value" id="score">0</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">Dots</span>
+                            <span class="hud-value" id="dots-count">0/0</span>
+                        </div>
+                        <div class="hud-item">
+                            <span id="current-product">Add items & start!</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">Time</span>
+                            <span class="hud-value" id="timer">0:00</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">Lives</span>
+                            <span class="hud-value lives" id="lives">❤️❤️❤️</span>
+                        </div>
+                    </div>
+
+                    <!-- Status Message -->
+                    <div id="status-message" class="status-message hidden"></div>
+
+                    <!-- Game Canvas -->
+                    <div class="canvas-container">
+                        <canvas id="game-canvas"></canvas>
+                    </div>
+
+                    <!-- Controls Hint -->
+                    <div class="controls-hint">
+                        <div class="control-key">
+                            <span class="key">↑</span>
+                            <span class="key">↓</span>
+                            <span class="key">←</span>
+                            <span class="key">→</span>
+                            <span>or WASD</span>
+                        </div>
+                        <div class="control-key">
+                            <span>📱 Swipe on mobile</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
